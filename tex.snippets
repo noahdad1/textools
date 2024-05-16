@@ -1,0 +1,355 @@
+###########
+# Context #
+###########
+
+global !p
+def math():
+	return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+
+def hasVis():
+	if snip.visual_text == "":
+		return 0
+	else:
+		return 1
+endglobal
+
+#############
+# Templates #
+#############
+
+snippet notetemplate "Creates NOTE template" 
+%This is the NOTE template%
+\documentclass{article}
+\input{../preamble.tex}
+
+\title{${1:The Smelly Buggers}}
+\author{Noah Plante}
+\date{ ${2:`date /t`} }
+
+\pagestyle{fancy}
+\fancyhead[L]{\textit{Noah Plante}}
+\fancyhead[C]{$1}
+\fancyhead[R]{ $2 }
+
+
+\begin{document}	
+\maketitle
+\pagebreak
+
+$0
+
+\end{document}
+endsnippet
+
+#######
+# TEX #
+#######
+snippet center "Begin Center" bA
+\\begin{center}
+	${VISUAL}$0
+\\end{center}
+endsnippet
+
+snippet align "Begin Align" bA
+\\begin{align*}
+	$0
+\\end{align*}
+endsnippet
+
+snippet figure "Figure environment" bA
+\\begin{figure}
+	\\centering
+	\\scalebox{${1:scaling}}{\\import{../images/}{${2:imagename}.pdf_tex}}
+\\end{figure}
+endsnippet
+
+snippet equation "gather* environment" bA
+\\begin{equation*}
+	$0
+\\end{equation*}
+endsnippet
+
+snippet gather "gather* environment" bA
+\\begin{gather*}
+	$0
+\\end{gather*}
+endsnippet
+
+context "math()"
+snippet text "Text block in math mode" iA
+\text{$1} $0
+endsnippet
+
+snippet b "Begin and Eng"
+\\begin{$1}
+	${VISUAL}$0
+\\end{$1}
+endsnippet
+
+#snippet b "Begin and End" b
+#\\begin\{$1}
+#	$0
+#\\end\{$1}
+#endsnippet
+#
+#snippet bv "Begin and End using VISUAL block"
+#\\begin\{$1}
+#	${VISUAL}
+#\\end\{$1}
+#endsnippet
+
+snippet section "Create Section" b
+\section*{$1}
+$0
+endsnippet
+
+snippet sectionnum "Create a Numbered section" b
+\section{$1}
+endsnippet
+
+snippet $$ "Inline Math" iwA
+$$1$ $0
+endsnippet
+
+snippet bold "Bold font" i
+\textbf{${VISUAL}$1} $0
+endsnippet
+
+snippet it "Italic text using selection"
+\textit{${VISUAL}$1} $0
+endsnippet
+
+snippet supert "Superscript Text" i
+\textsuperscript{$1} $0
+endsnippet
+
+#########
+# Other #
+#########
+
+context "math()"
+snippet mcol "Math color" iwA
+\color{$1}{$2}$0
+endsnippet
+
+snippet colour "Change text colour"
+\textcolor{${VISUAL}}{${2:TeX to be coloured}} $0
+endsnippet
+
+snippet today "Date in mm/dd/yy"
+`date /t`
+endsnippet
+
+#########
+# Boxes #
+#########
+
+snippet box "Box"
+`!p snip.rv = '┌' + '─' * (len(t[1]) + 2) + '┐'`
+│ $1 │
+`!p snip.rv = '└' + '─' * (len(t[1]) + 2) + '┘'`
+$0
+endsnippet
+
+###########
+# siunitx #
+###########
+
+#context "si()"
+#snippet kg "kilogram" flags
+#\kilogram
+#endsnippet
+
+context "math()"
+snippet unit "SIENV" iw
+\unit{$1} $0
+endsnippet
+
+context "math()"
+snippet num "SIENV" iw
+\num{$1}$0
+endsnippet
+
+context "math()"
+snippet m "meter" iw
+\unit{\meter}$0
+endsnippet
+
+context "math()"
+snippet m/s2 "meters per second squared" iw
+\unit{\meter\per\second\squared}
+endsnippet
+
+##################
+# Math Functions #
+##################
+
+snippet times "x" iwA
+\times
+endsnippet
+
+context "math()"
+snippet '([a-zA-Z])\^(\d[a-zA-Z])' "superscript" wrA
+`!p snip.rv = match.group(1)`^`!p snip.rv = match.group(2)` $0
+endsnippet
+
+context "math()"
+snippet '([a-zA-Z])\^(\d\d|[a-zA-Z][a-zA-Z])' "superscript" wrA
+`!p snip.rv = match.group(1)`^{`!p snip.rv = match.group(2)`$1} $0
+endsnippet
+
+context "math()" 
+snippet '(\}|\)|[a-zA-Z])_(\d\d|[a-zA-Z][a-zA-Z])' "subscript" wrA
+`!p snip.rv = match.group(1)`_{`!p snip.rv = match.group(2)`$1}$0
+endsnippet
+
+snippet mv "Inline math selection"
+\[
+	${VISUAL} $1
+\]
+
+$0
+endsnippet
+
+snippet -= "&=" iA
+&=
+endsnippet
+
+context "math()"
+snippet sum "Sum" iw
+\sum $0
+endsnippet
+
+snippet bsum "Sum with bounds" A
+\sum_{${1:i}=${2:1}}^{${3:n}} $0
+endsnippet
+
+priority 100
+snippet int "Integral" iw
+\int {$1} $0
+endsnippet
+
+priority 300
+context "math()"
+snippet bint "Integral with bounds" iwA
+\int_{$1}^{$2} $0
+endsnippet
+
+priority 100
+context "math()"
+snippet '(?<!\\)(sin|cos|tan|sec|csc|arccot|cot|csc|ln|log|exp|star|perp)' "ln" rwA
+\\`!p snip.rv = match.group(1)` $0
+endsnippet
+
+priority 200
+context "math()"
+snippet '(?<!\\)(arcsin|arccos|arctan|arccot|arccsc|arcsec|pi|zeta|int)' "ln" rwA
+\\`!p snip.rv = match.group(1)` $0
+endsnippet
+
+context "math()"
+snippet '(\d|\d\d)/(\d|\d\d\b)' "Small fraction" rwA
+\frac{`!p snip.rv = match.group(1)`}{`!p snip.rv = match.group(2)`}
+endsnippet
+
+context "math()"
+context "hasVis()"
+snippet // "Fraction {VISUAL}" eiA
+\\frac{${VISUAL}}{$2} $0
+endsnippet
+
+context "math()"
+snippet // "Fraction" iA
+\frac{$1}{$2} $0
+endsnippet
+
+snippet lim "Limit as x goes to infinity" iw
+\\lim_{${1:x} \\to ${2:\\infty}} $0
+endsnippet
+
+#################
+# Math Notation # 
+#################
+
+context "math()"
+snippet nrt "n root" iwA
+\sqrt{$1} $0
+endsnippet
+
+context "math()"
+snippet sqrt "Square root" iwA
+\sqrt{$1} $0
+endsnippet
+
+snippet () "Elipses/Brackets" iwA
+($1) $0
+endsnippet
+
+snippet [] "Square brackets" iwA
+[$1] $0
+endsnippet
+
+snippet '(\d|[a-zA-Z]|''|\_){}' "Braces" riwA
+`!p snip.rv=match.group(1)`{$1}$0
+endsnippet
+
+snippet "([a-zA-Z])ddot" "double dotted number" riA
+\ddot{`!p snip.rv=match.group(1)`}
+endsnippet
+
+context "math()"
+snippet "([a-zA-Z])dot" "dotted number" riA
+\dot{`!p snip.rv=match.group(1)`}
+endsnippet
+
+snippet "([a-zA-Z])bar" "BAR as in 'x bar'" riA
+\overline{`!p snip.rv=match.group(1)`}
+endsnippet
+
+snippet "([a-zA-Z])vec" "vector hat" riA
+\vec{`!p snip.rv=match.group(1)`}
+endsnippet
+
+context "math()"
+
+snippet "([a-zA-Z])hat" "hat" riA
+\hat{`!p snip.rv=match.group(1)`}
+endsnippet
+
+###########
+# Symbols #
+###########
+
+context "math()"
+snippet equiv "Equivalent/Relation" iwA
+\equiv $0
+endsnippet
+
+snippet infty "Infinity Symbol" iwA
+\infty $0
+endsnippet
+
+snippet alp "Greek Alpha" i
+\alpha $0
+endsnippet
+
+snippet bet "Greek Beta" i
+\beta $0
+endsnippet
+
+snippet gam "Greek Gamma" i
+\gamma $0
+endsnippet
+
+snippet ggam "Greek Gamma Uppercase" i
+\Gamma $0
+endsnippet
+
+snippet ddelta "Captial delta" i
+\Delta $0 
+endsnippet
+
+context "math()"
+snippet thet "Theta" iA
+\theta
+endsnippet
